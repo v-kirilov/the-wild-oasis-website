@@ -10,6 +10,13 @@ export async function generateMetadata({ params }) {
   };
 }
 
+export async function generateStaticParams() {
+  const cabins = await getCabins();
+  return cabins.map((cabin) => ({
+    cabinId: cabin.id.toString(),
+  }));
+}
+
 export default async function Page({ params }) {
   const cabin = await getCabin(params.cabinId);
 
