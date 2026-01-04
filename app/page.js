@@ -32,3 +32,4 @@ export default function Home() {
 // npm i @heroicons/react
 // npm i date-fns
 // npm i @supabase/supabase-js
+// npm i react-day-picker
