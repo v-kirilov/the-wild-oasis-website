@@ -23,7 +23,7 @@ export default async function Page({ params }) {
   const cabin = await getCabin(params.cabinId);
 
   return (
-    <div className="max-w-6xl mx-auto mt-8">
+    <div className="max-w-fit mx-auto mt-8">
       <Cabin cabin={cabin} />
 
       <div>
