@@ -33,3 +33,4 @@ export default function Home() {
 // npm i date-fns
 // npm i @supabase/supabase-js
 // npm i react-day-picker
+// npm i next-auth@beta
