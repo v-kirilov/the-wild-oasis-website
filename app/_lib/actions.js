@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { auth, signIn, signOut } from "./auth";
 import { supabase } from "./supabase";
 import { getBookings } from "./data-service";
+import { redirect } from "next/navigation";
 
 export async function updateGuest(formdata) {
   const session = await auth();
@@ -54,7 +55,7 @@ export async function deleteReservation(bookingId) {
   const guestBookings = await getBookings(session.user.guestId);
   const bookingIds = guestBookings.map((booking) => booking.id);
 
-  if(!bookingIds.includes(bookingId)) {
+  if (!bookingIds.includes(bookingId)) {
     throw new Error("You are not authorized to delete this booking");
   }
 
@@ -67,4 +68,50 @@ export async function deleteReservation(bookingId) {
     throw new Error("Booking could not be deleted");
   }
   revalidatePath("/account/reservations");
+}
+
+export async function updateBooking(formdata) {
+  const bookingId = Number(formdata.get("bookingId"));
+
+  // 1. Authentication
+  const session = await auth();
+  if (!session) {
+    throw new Error("Not authenticated!");
+  }
+
+  // 2. Authorization
+  const guestBookings = await getBookings(session.user.guestId);
+  const bookingIds = guestBookings.map((booking) => booking.id);
+
+  if (!bookingIds.includes(bookingId)) {
+    throw new Error("You are not authorized to update this booking");
+  }
+
+  // 3. Building update data
+  const updateData = {
+    numGuests: Number(formdata.get("numGuests")),
+    observations: formdata.get("observations").slice(0, 1000),
+  };
+
+
+  // 4. Mutation
+  const { data, error } = await supabase
+    .from("bookings")
+    .update(updateData)
+    .eq("id", bookingId)
+    .select()
+    .single();
+
+  // 5. Error handling
+  if (error) {
+    console.error(error);
+    throw new Error("Guest could not be updated");
+  }
+
+  // 6. Revalidation
+  revalidatePath("/account/reservations");
+  revalidatePath(`/account/reservations/edit/${bookingId}`);
+
+  // 7. Redirect
+  redirect(`/account/reservations`);
 }
