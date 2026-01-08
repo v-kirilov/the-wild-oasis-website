@@ -93,7 +93,6 @@ export async function updateBooking(formdata) {
     observations: formdata.get("observations").slice(0, 1000),
   };
 
-
   // 4. Mutation
   const { data, error } = await supabase
     .from("bookings")
